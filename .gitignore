@@ -1,0 +1,15 @@
+# individual file extensions to ignore
+*.mlapp
+*.json
+*.txt
+*.ipynb
+*.py~
+*.md
+
+# directories to ignore
+__pycache__/
+data_Extracts/
+output_logs/
+output_plots/
+behaviors/
+
