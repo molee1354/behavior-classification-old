@@ -12,14 +12,15 @@ from operator import itemgetter
 
 from bed_analysis import RegFile, DiscFile
 
-TASK_ID = "Bennu_1x"
+# TASK_ID = "Bennu_1x"
+TASK_ID = "LIS02"
 try:
     TASK_ID = sys.argv[1]
 except IndexError:
     pass
 
 # TRIAL_ID = "testing4"
-TRIAL_ID = "testing1"
+TRIAL_ID = "testing8"
 try:
     TRIAL_ID = sys.argv[2]
 except IndexError:
@@ -29,6 +30,7 @@ def get_points(
     time: tuple[int, int],
     bed_obj: RegFile, 
     pIDs: list[int], 
+    init_surface_idx: list[int],
     disc_params: tuple[float, float, float]
     ) -> tuple[tuple[float, float], tuple[float, float], list[int]]:
     """
@@ -46,6 +48,9 @@ def get_points(
     
     #* computing the reduced bed
     bed = bed_obj.get_bed(*time, pIDs) # method returns a _Bed object
+
+    # the bed surface does not update for each simulation timeframe
+    bed_surface = bed_obj.get_bed(*time, init_surface_idx)
 
     #* bed.surface
     #* bed.crater
@@ -85,7 +90,7 @@ def get_points(
     disc_x, disc_y, disc_r = disc_params
 
     #* disc_r * (the ratio of the disc R to the single particle R + disc R) * 110%
-    touch_idx = bed.is_within_circle( (disc_x, disc_y), disc_r*((1197+8075)/8075)*1.1)
+    touch_idx = bed_surface.is_within_circle( (disc_x, disc_y), disc_r*((1197+8075)/8075)*1.1)
 
     return bed.crater, (mound_x, mound_y), touch_idx
 
@@ -109,6 +114,8 @@ def get_data_dict(bed_filepath: str, disc_filepath: str) -> list[float]:
     #! 1.4 --> 2.5 seconds
     #! 1.35 --> 3.0 seconds
     reduced_idx = initBed.is_greater('y', 0.13)
+    
+    init_surface_idx = initBed.get_surface()
 
     #* the timesteps for which the data is significant
     # ts_cutoff = pDisc.ts_cutoff
@@ -136,6 +143,7 @@ def get_data_dict(bed_filepath: str, disc_filepath: str) -> list[float]:
             time, 
             pBed, 
             reduced_idx,
+            init_surface_idx,
             (
             #* recall that for the disc, it's not called by the timestep
             #* as they are all loaded as arrays already
@@ -183,11 +191,11 @@ def get_path(filetype: str, angle: int, vel: float) -> str:
     base = Path(os.getcwd()) #* getting the parent directory
 
     if filetype == "bed":
-        # return f"{base.parent.absolute()}/Output/lmpDump_{TASK_ID}/lmpDump_A{angle}/iteration_V{vel}_A{angle}/dmp.reg.{TASK_ID}_V{vel}_A{angle}"
-        return f"{base.parent.absolute()}/Output/bennu_raw/lmpDump_A{angle}/iteration_V{vel}_A{angle}/dmp.reg.{TASK_ID}_V{vel}_A{angle}"
+        return f"{base.parent.absolute()}/Output/lmpDump_{TASK_ID}/lmpDump_A{angle}/iteration_V{vel}_A{angle}/dmp.reg.{TASK_ID}_V{vel}_A{angle}"
+        # return f"{base.parent.absolute()}/Output/bennu_raw/lmpDump_A{angle}/iteration_V{vel}_A{angle}/dmp.reg.{TASK_ID}_V{vel}_A{angle}"
     elif filetype == "disc":
-        # return f"{base.parent.absolute()}/Output/lmpDump_{TASK_ID}/lmpDump_A{angle}/iteration_V{vel}_A{angle}/dmp.disc.{TASK_ID}_V{vel}_A{angle}"
-        return f"{base.parent.absolute()}/Output/bennu_raw/lmpDump_A{angle}/iteration_V{vel}_A{angle}/dmp.disc.{TASK_ID}_V{vel}_A{angle}"
+        return f"{base.parent.absolute()}/Output/lmpDump_{TASK_ID}/lmpDump_A{angle}/iteration_V{vel}_A{angle}/dmp.disc.{TASK_ID}_V{vel}_A{angle}"
+        # return f"{base.parent.absolute()}/Output/bennu_raw/lmpDump_A{angle}/iteration_V{vel}_A{angle}/dmp.disc.{TASK_ID}_V{vel}_A{angle}"
 
 
 def extract_to_json(bed_filepath: str, disc_filepath: str):
@@ -209,11 +217,11 @@ def main():
     #* loop over angles and such here 
 
     # vectors to loop angles -> velocities
-    with open("velocities.json", 'r') as f:
-        vels = json.load(f)
+    # with open("velocities.json", 'r') as f:
+    #     vels = json.load(f)
 
-    velocities = vels["velocities"]
-    # velocities = np.linspace(1.0, 7.0, 13)
+    # velocities = vels["velocities"]
+    velocities = np.linspace(1.0, 7.0, 13)
     angles = np.linspace(20, 70, 11, dtype=int)
     # velocities = [7.0]
     # angles = [25]
