@@ -28,7 +28,7 @@ except IndexError:
 
 
 BASE = Path(os.getcwd()) #* getting the parent directory
-PATH = f"{BASE.parent.absolute()}/Datas/B2/"
+PATH = f"{BASE.parent.absolute()}/Datas/B;2/"
 
 def get_points(
     time: tuple[int, int],
