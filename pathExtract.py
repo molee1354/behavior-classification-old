@@ -12,19 +12,23 @@ from operator import itemgetter
 
 from bed_analysis import RegFile, DiscFile
 
-# TASK_ID = "Bennu_1x"
-TASK_ID = "LIS02"
+TASK_ID = "Bennu_1x"
+# TASK_ID = "LIS02"
 try:
     TASK_ID = sys.argv[1]
 except IndexError:
     pass
 
 # TRIAL_ID = "testing4"
-TRIAL_ID = "testing8"
+TRIAL_ID = "cls1108_B2"
 try:
     TRIAL_ID = sys.argv[2]
 except IndexError:
     pass
+
+
+BASE = Path(os.getcwd()) #* getting the parent directory
+PATH = f"{BASE.parent.absolute()}/Datas/B2/"
 
 def get_points(
     time: tuple[int, int],
@@ -188,14 +192,11 @@ def get_path(filetype: str, angle: int, vel: float) -> str:
     """
     Function to get the filepaths for the angles
     """
-    base = Path(os.getcwd()) #* getting the parent directory
 
     if filetype == "bed":
-        return f"{base.parent.absolute()}/Output/lmpDump_{TASK_ID}/lmpDump_A{angle}/iteration_V{vel}_A{angle}/dmp.reg.{TASK_ID}_V{vel}_A{angle}"
-        # return f"{base.parent.absolute()}/Output/bennu_raw/lmpDump_A{angle}/iteration_V{vel}_A{angle}/dmp.reg.{TASK_ID}_V{vel}_A{angle}"
+        return f"{PATH}/dmp.reg.{TASK_ID}_V{vel}_A{angle}"
     elif filetype == "disc":
-        return f"{base.parent.absolute()}/Output/lmpDump_{TASK_ID}/lmpDump_A{angle}/iteration_V{vel}_A{angle}/dmp.disc.{TASK_ID}_V{vel}_A{angle}"
-        # return f"{base.parent.absolute()}/Output/bennu_raw/lmpDump_A{angle}/iteration_V{vel}_A{angle}/dmp.disc.{TASK_ID}_V{vel}_A{angle}"
+        return f"{PATH}/dmp.disc.{TASK_ID}_V{vel}_A{angle}"
 
 
 def extract_to_json(bed_filepath: str, disc_filepath: str):
@@ -214,17 +215,12 @@ def extract_to_json(bed_filepath: str, disc_filepath: str):
     # return bed_filepath[-8:]
 
 def main():
-    #* loop over angles and such here 
-
     # vectors to loop angles -> velocities
-    # with open("velocities.json", 'r') as f:
-    #     vels = json.load(f)
 
-    # velocities = vels["velocities"]
-    velocities = np.linspace(1.0, 7.0, 13)
+    # velocities = np.linspace(1.0, 7.0, 13)
+    velocities = list(set([re.findall("(V[0-9]+\.[0-9]+)",f)[0][1:]
+                for f in os.listdir(PATH) if "dmp.reg" in f]))
     angles = np.linspace(20, 70, 11, dtype=int)
-    # velocities = [7.0]
-    # angles = [25]
 
     for angle in angles:
         beds = []
