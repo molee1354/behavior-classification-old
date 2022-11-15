@@ -12,23 +12,25 @@ from operator import itemgetter
 
 from bed_analysis import RegFile, DiscFile
 
-TASK_ID = "Bennu_1x"
+task = sys.argv[1]
+
+TASK_ID = "Moon_1x"
+TRIAL_ID = f"cls1108_{task}"
 # TASK_ID = "LIS02"
-try:
-    TASK_ID = sys.argv[1]
-except IndexError:
-    pass
+# try:
+#     TASK_ID = sys.argv[1]
+# except IndexError:
+#     pass
 
 # TRIAL_ID = "testing4"
-TRIAL_ID = "cls1108_B2"
-try:
-    TRIAL_ID = sys.argv[2]
-except IndexError:
-    pass
+# try:
+#     TRIAL_ID = sys.argv[2]
+# except IndexError:
+#     pass
 
 
 BASE = Path(os.getcwd()) #* getting the parent directory
-PATH = f"{BASE.parent.absolute()}/Datas/B;2/"
+PATH = f"/mnt/p/ROUND2_data/{task}"
 
 def get_points(
     time: tuple[int, int],

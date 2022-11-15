@@ -5,6 +5,7 @@
 *.ipynb
 *.py~
 *.md
+*.tar.gz
 
 # directories to ignore
 __pycache__/
@@ -12,4 +13,4 @@ data_Extracts/
 output_logs/
 output_plots/
 behaviors/
-
+venv/
