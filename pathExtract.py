@@ -12,10 +12,7 @@ from operator import itemgetter
 
 from bed_analysis import RegFile, DiscFile
 
-task = sys.argv[1]
-
-TASK_ID = "Moon_1x"
-TRIAL_ID = f"cls1108_{task}"
+TASK_ID = "Earth_1x"
 # TASK_ID = "LIS02"
 # try:
 #     TASK_ID = sys.argv[1]
@@ -23,14 +20,15 @@ TRIAL_ID = f"cls1108_{task}"
 #     pass
 
 # TRIAL_ID = "testing4"
-# try:
-#     TRIAL_ID = sys.argv[2]
-# except IndexError:
-#     pass
+TRIAL_ID = "v_ext_E4"
+try:
+    TRIAL_ID = sys.argv[2]
+except IndexError:
+    pass
 
 
 BASE = Path(os.getcwd()) #* getting the parent directory
-PATH = f"/mnt/p/ROUND2_data/{task}"
+PATH = f"{BASE.parent.absolute()}/Datas/E2_ext/"
 
 def get_points(
     time: tuple[int, int],
@@ -96,6 +94,8 @@ def get_points(
     disc_x, disc_y, disc_r = disc_params
 
     #* disc_r * (the ratio of the disc R to the single particle R + disc R) * 110%
+    # taking the 'is_within_circle()' query from bed_surface object --> isolates
+    #   to only the surface particles
     touch_idx = bed_surface.is_within_circle( (disc_x, disc_y), disc_r*((1197+8075)/8075)*1.1)
 
     return bed.crater, (mound_x, mound_y), touch_idx
